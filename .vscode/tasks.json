@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Compile + Run GLUT",
+      "type": "shell",
+      "command": "g++ \"${file}\" -o \"${fileDirname}/${fileBasenameNoExtension}\" -framework GLUT -framework OpenGL -Wno-deprecated-declarations && \"${fileDirname}/${fileBasenameNoExtension}\"",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "clear": true,
+        "focus": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}
