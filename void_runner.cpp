@@ -1,12 +1,7 @@
 /*
     VOID RUNNER - Simple Version
-    OpenGL + GLUT (Dev-C++)
+    OpenGL + GLUT
 
-    TIDAK menggunakan freeglut.
-    Gunakan glut32 (GLUT standar untuk Windows).
-
-    Setup Dev-C++:
-      Linker: -lopengl32 -lglu32 -lglut32
 
       File yang dibutuhkan (taruh di folder project):
         glut32.dll
@@ -61,7 +56,7 @@ int gScore = 0;
 int gFrame = 0;
 float gSpeed = 5.0f;
 
-int gLane = 1; /* lane player: 0=kiri, 1=tengah, 2=kanan */
+int gLane = 1;
 float gPlayerX = 0.0f;
 
 /* -- Obstacle ---------------------------- */
@@ -122,7 +117,7 @@ int checkHit()
     {
         if (!gObs[i].active)
             continue;
-        if (myabs(gObs[i].z) < 1.8f && myabs(gObs[i].x - gPlayerX) < 1.5f)
+        if (myabs(gObs[i].z - 1.8f) < 1.7f && myabs(gObs[i].x - gPlayerX) < 0.9f)
             return 1;
     }
     return 0;
@@ -166,36 +161,268 @@ void drawBox(float w, float h, float d)
     glEnd();
 }
 
-/* -- Gambar player (kotak biru) ----------- */
+/* -- Gambar player (roket luar angkasa) ----------- */
 void drawPlayer()
 {
     glPushMatrix();
     glTranslatef(gPlayerX, 0.0f, 0.0f);
-    /* Badan */
-    glColor3f(0.2f, 0.6f, 1.0f);
-    drawBox(1.5f, 0.5f, 2.0f);
-    /* Sayap kiri */
-    glColor3f(0.1f, 0.3f, 0.8f);
+    glTranslatef(0.0f, 0.0f, 1.8f);
+
+    /* === BADAN UTAMA (fuselage putih-abu) === */
+    glColor3f(0.92f, 0.92f, 0.95f);
+    drawBox(0.30f, 0.30f, 1.75f);
+
+    /* Selubung belakang — sedikit lebih lebar */
+    glColor3f(0.82f, 0.83f, 0.88f);
     glPushMatrix();
-    glTranslatef(-1.2f, 0.0f, 0.3f);
-    drawBox(1.0f, 0.1f, 0.9f);
+    glTranslatef(0.0f, 0.0f, -0.55f);
+    drawBox(0.38f, 0.38f, 0.55f);
     glPopMatrix();
-    /* Sayap kanan */
+
+    /* === NOSE CONE bertingkat mengerucut ke +z === */
+    glColor3f(0.88f, 0.88f, 0.92f);
     glPushMatrix();
-    glTranslatef(1.2f, 0.0f, 0.3f);
-    drawBox(1.0f, 0.1f, 0.9f);
+    glTranslatef(0.0f, 0.0f, 1.02f);
+    drawBox(0.24f, 0.24f, 0.38f);
     glPopMatrix();
+
+    glColor3f(0.80f, 0.80f, 0.86f);
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, 1.28f);
+    drawBox(0.16f, 0.16f, 0.28f);
+    glPopMatrix();
+
+    glColor3f(0.70f, 0.70f, 0.78f);
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, 1.48f);
+    drawBox(0.09f, 0.09f, 0.18f);
+    glPopMatrix();
+
+    /* Ujung paling runcing */
+    glColor3f(0.60f, 0.60f, 0.70f);
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, 1.62f);
+    drawBox(0.04f, 0.04f, 0.10f);
+    glPopMatrix();
+
+    /* === CINCIN AKSEN ORANYE === */
+    glColor3f(1.0f, 0.42f, 0.07f);
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, 0.55f);
+    drawBox(0.315f, 0.315f, 0.09f);
+    glPopMatrix();
+
+    glColor3f(1.0f, 0.42f, 0.07f);
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, -0.22f);
+    drawBox(0.315f, 0.315f, 0.07f);
+    glPopMatrix();
+
+    /* === JENDELA (porthole biru) === */
+    glColor3f(0.25f, 0.55f, 0.95f);
+    glPushMatrix();
+    glTranslatef(0.155f, 0.06f, 0.62f);
+    drawBox(0.04f, 0.09f, 0.09f);
+    glPopMatrix();
+
+    /* === SECTION MESIN === */
+    glColor3f(0.48f, 0.50f, 0.58f);
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, -0.98f);
+    drawBox(0.40f, 0.40f, 0.32f);
+    glPopMatrix();
+
+    /* === 4 SIRIP EKOR (fins) === */
+    glColor3f(0.88f, 0.28f, 0.06f);
+
+    /* Atas */
+    glPushMatrix();
+    glTranslatef(0.0f, 0.40f, -0.92f);
+    drawBox(0.065f, 0.55f, 0.62f);
+    glPopMatrix();
+
+    /* Bawah */
+    glPushMatrix();
+    glTranslatef(0.0f, -0.40f, -0.92f);
+    drawBox(0.065f, 0.55f, 0.62f);
+    glPopMatrix();
+
+    /* Kiri */
+    glPushMatrix();
+    glTranslatef(-0.40f, 0.0f, -0.92f);
+    drawBox(0.55f, 0.065f, 0.62f);
+    glPopMatrix();
+
+    /* Kanan */
+    glPushMatrix();
+    glTranslatef(0.40f, 0.0f, -0.92f);
+    drawBox(0.55f, 0.065f, 0.62f);
+    glPopMatrix();
+
+    /* Ujung sirip (sedikit lebih gelap) */
+    glColor3f(0.65f, 0.18f, 0.04f);
+    glPushMatrix();
+    glTranslatef(0.0f, 0.68f, -1.05f);
+    drawBox(0.055f, 0.18f, 0.38f);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.0f, -0.68f, -1.05f);
+    drawBox(0.055f, 0.18f, 0.38f);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-0.68f, 0.0f, -1.05f);
+    drawBox(0.18f, 0.055f, 0.38f);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.68f, 0.0f, -1.05f);
+    drawBox(0.18f, 0.055f, 0.38f);
+    glPopMatrix();
+
+    /* === NOZZLE MESIN === */
+    glColor3f(0.15f, 0.15f, 0.20f);
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, -1.20f);
+    drawBox(0.26f, 0.26f, 0.16f);
+    glPopMatrix();
+
+    /* Bibir nozzle (ring gelap) */
+    glColor3f(0.10f, 0.10f, 0.14f);
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, -1.30f);
+    drawBox(0.30f, 0.30f, 0.06f);
+    glPopMatrix();
+
+    /* === API MESIN (animasi flicker) === */
+    float flicker = 0.78f + 0.22f * (float)sin(gFrame * 0.45f);
+    float flicker2 = 0.70f + 0.30f * (float)sin(gFrame * 0.60f + 1.2f);
+
+    /* Lapisan luar — oranye */
+    glColor3f(1.0f * flicker, 0.48f * flicker, 0.04f);
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, -1.42f);
+    drawBox(0.22f * flicker, 0.22f * flicker, 0.18f);
+    glPopMatrix();
+
+    /* Lapisan tengah — kuning */
+    glColor3f(1.0f, 0.82f * flicker2, 0.18f * flicker2);
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, -1.52f);
+    drawBox(0.13f * flicker2, 0.13f * flicker2, 0.14f);
+    glPopMatrix();
+
+    /* Inti api — putih */
+    glColor3f(1.0f, 0.97f, 0.85f);
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, -1.60f);
+    drawBox(0.06f, 0.06f, 0.09f);
+    glPopMatrix();
+
     glPopMatrix();
 }
 
-/* -- Gambar rintangan (kotak merah) ------- */
-void drawObstacle(float x, float z)
+/* -- Gambar satu kotak kasar (chunk batu) -- */
+void drawChunk(float w, float h, float d, float rx, float ry, float rz, float angle)
 {
     glPushMatrix();
-    glTranslatef(x, 0.0f, z);
-    glColor3f(1.0f, 0.2f, 0.1f);
-    drawBox(1.8f, 1.8f, 1.8f);
+    glRotatef(angle, rx, ry, rz);
+    drawBox(w, h, d);
     glPopMatrix();
+}
+
+/* -- Gambar asteroid berbatu ------------------ */
+void drawAsteroid(float x, float z, int id)
+{
+    /* Tiap asteroid punya ukuran & rotasi berbeda berdasarkan id */
+    float scale = 0.85f + (id % 4) * 0.1f;
+    float rSpeed = 18.0f + (id % 6) * 7.0f;
+    float rAngle = (float)fmod(gFrame * rSpeed * 0.01, 360.0);
+    float axX = 0.3f + (id % 3) * 0.25f;
+    float axZ = 0.2f + (id % 5) * 0.15f;
+
+    glPushMatrix();
+    glTranslatef(x, 0.1f * scale, z);
+
+    /* Tumbling rotation — tiap asteroid berputar dengan sumbu unik */
+    glRotatef(rAngle, axX, 1.0f, axZ);
+    glScalef(scale, scale, scale);
+
+    /* -- Badan utama (abu gelap kecokelatan) -- */
+    glColor3f(0.40f, 0.36f, 0.30f);
+    drawBox(1.3f, 1.15f, 1.4f);
+
+    /* -- Tonjolan atas-kiri -- */
+    glColor3f(0.33f, 0.29f, 0.24f);
+    drawChunk(0.75f, 0.6f, 0.65f, 0.3f, 0.8f, 0.5f, 32.0f);
+
+    /* -- Tonjolan bawah-kanan -- */
+    glColor3f(0.30f, 0.27f, 0.22f);
+    glPushMatrix();
+    glTranslatef(0.5f, -0.45f, 0.3f);
+    drawChunk(0.65f, 0.55f, 0.7f, 0.7f, 0.2f, 0.6f, -28.0f);
+    glPopMatrix();
+
+    /* -- Tonjolan sisi kiri -- */
+    glColor3f(0.35f, 0.31f, 0.26f);
+    glPushMatrix();
+    glTranslatef(-0.62f, 0.15f, -0.2f);
+    drawChunk(0.6f, 0.75f, 0.5f, 0.5f, 0.3f, 0.8f, 20.0f);
+    glPopMatrix();
+
+    /* -- Tonjolan depan -- */
+    glColor3f(0.28f, 0.25f, 0.20f);
+    glPushMatrix();
+    glTranslatef(0.2f, 0.35f, 0.6f);
+    drawChunk(0.55f, 0.5f, 0.6f, 0.1f, 0.9f, 0.4f, -35.0f);
+    glPopMatrix();
+
+    /* -- Tonjolan belakang -- */
+    glColor3f(0.32f, 0.28f, 0.23f);
+    glPushMatrix();
+    glTranslatef(-0.25f, -0.2f, -0.62f);
+    drawChunk(0.7f, 0.45f, 0.55f, 0.6f, 0.4f, 0.2f, 18.0f);
+    glPopMatrix();
+
+    /* -- Kawah 1 (cekungan gelap di permukaan atas) -- */
+    glColor3f(0.16f, 0.14f, 0.11f);
+    glPushMatrix();
+    glTranslatef(0.1f, 0.62f, 0.05f);
+    glScalef(1.0f, 0.15f, 1.0f); /* pipih = kesan kawah */
+    drawBox(0.42f, 0.3f, 0.38f);
+    glPopMatrix();
+
+    /* -- Kawah 2 (sisi depan) -- */
+    glColor3f(0.14f, 0.12f, 0.10f);
+    glPushMatrix();
+    glTranslatef(-0.2f, 0.1f, 0.68f);
+    glScalef(0.15f, 1.0f, 1.0f);
+    drawBox(0.3f, 0.32f, 0.28f);
+    glPopMatrix();
+
+    /* -- Bercak terang (highlight mineral) -- */
+    glColor3f(0.55f, 0.50f, 0.42f);
+    glPushMatrix();
+    glTranslatef(0.35f, 0.55f, 0.35f);
+    glScalef(1.0f, 0.12f, 1.0f);
+    drawBox(0.2f, 0.18f, 0.18f);
+    glPopMatrix();
+
+    glColor3f(0.50f, 0.46f, 0.38f);
+    glPushMatrix();
+    glTranslatef(-0.4f, 0.3f, 0.4f);
+    glScalef(1.0f, 0.12f, 1.0f);
+    drawBox(0.15f, 0.15f, 0.16f);
+    glPopMatrix();
+
+    glPopMatrix();
+}
+
+/* -- Wrapper -- */
+void drawObstacle(float x, float z, int id)
+{
+    drawAsteroid(x, z, id);
 }
 
 /* -- Gambar jalan ------------------------- */
@@ -297,7 +524,7 @@ void drawHUD()
     drawText(15, WIN_H - 68, "LANE:");
     for (i = 0; i < 3; i++)
     {
-        if (i == gLane)
+        if ((2 - i) == gLane)
             glColor3f(0.3f, 1.0f, 0.4f);
         else
             glColor3f(0.4f, 0.4f, 0.4f);
@@ -380,7 +607,7 @@ void display()
         drawPlayer();
         for (i = 0; i < MAX_OBS; i++)
             if (gObs[i].active)
-                drawObstacle(gObs[i].x, gObs[i].z);
+                drawObstacle(gObs[i].x, gObs[i].z, i);
         drawHUD();
     }
 
