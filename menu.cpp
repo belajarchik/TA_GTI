@@ -20,7 +20,7 @@ int strWidth(void* font, const char* s)
     return w;
 }
 
-// Fungsi menggambar kotak (digunakan untuk background)
+// Fungsi menggambar kotak digunakan untuk background
 void fillRect(float x, float y, float w, float h)
 {
     glBegin(GL_QUADS);
@@ -32,7 +32,6 @@ void fillRect(float x, float y, float w, float h)
 }
 
 // Layar Menu Awal 
-/* -- Layar Menu Awal dengan Kotak Panel Modis ── */
 void drawMenu()
 {
     float cx = WIN_W * 0.5f;
@@ -53,11 +52,11 @@ void drawMenu()
     float boxX = cx - (boxW * 0.5f);
     float boxY = cy - (boxH * 0.5f) + 10;
 
-    // 1. Isi Kotak (Hitam pekat transparan)
+    // Isi Kotak 
     glColor4f(0.02f, 0.02f, 0.05f, 0.85f); 
     fillRect(boxX, boxY, boxW, boxH);
 
-    // 2. Garis Tepi Kotak / Border (Warna Biru Cyan Neon)
+    // Garis Tepi Kotak 
     glColor3f(0.3f, 0.8f, 1.0f); 
     glLineWidth(3.0f); // Menebalkan garis kotak
     glBegin(GL_LINE_LOOP);
@@ -66,10 +65,10 @@ void drawMenu()
         glVertex2f(boxX + boxW, boxY + boxH);
         glVertex2f(boxX, boxY + boxH);
     glEnd();
-    glLineWidth(1.0f); // Reset ketebalan garis
+    glLineWidth(1.0f); 
 
     // Judul Game
-    const char* title = "VOID RUNNER 3D";
+    const char* title = "HyperNova Escape";
     float tw = (float)strWidth(fontJudul, title);
     float titleY = boxY + boxH - 45;
 
@@ -81,7 +80,7 @@ void drawMenu()
     glRasterPos2f(cx - tw * 0.5f, titleY);
     for (p = title; *p; p++) { glutBitmapCharacter(fontJudul, *p); }
 
-    // Petunjuk Kontrol (Ditata rapi ke bawah)
+    // Petunjuk Kontrol 
     const char* baris1 = "Gunakan Arrow Kiri/Kanan atau A/D";
     const char* baris2 = "untuk berpindah lane.";
     const char* baris3 = "Nabrak rintangan = langsung MATI!";
