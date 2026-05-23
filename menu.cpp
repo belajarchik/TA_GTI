@@ -1,4 +1,5 @@
-#include <GLUT/glut.h>
+#include <GL/freeglut.h>
+
 #include "menu.h"
 #include <stdio.h>
 

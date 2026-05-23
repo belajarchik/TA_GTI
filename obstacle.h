@@ -4,7 +4,8 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
-#include <GLUT/glut.h>
+// #include <GL/glut.h>
+#include <GL/freeglut.h>
 #include <math.h>
 
 /* PAKSA DECLARE */

@@ -3,8 +3,8 @@
 #endif
 
 // #include <GL/gl.h>
-// #include <GL/glu.h>
-#include <GLUT/glut.h>
+#include <GL/freeglut.h>
+// #include <GL/glut.h>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
@@ -70,6 +70,10 @@ void initTexture()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    #ifndef GL_CLAMP_TO_EDGE
+    #define GL_CLAMP_TO_EDGE 0x812F
+    #endif
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -103,7 +107,13 @@ void drawBackground()
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    gluOrtho2D(0.0, 1.0, 0.0, 1.0);
+    // gluOrtho2D(0.0, 1.0, 0.0, 1.0);
+    float aspect = (float)WIN_W / (float)WIN_H;
+
+    if (aspect >= 1.0f)
+        gluOrtho2D(-aspect, aspect, -1.0, 1.0);
+    else
+        gluOrtho2D(-1.0, 1.0, -1.0 / aspect, 1.0 / aspect);
 
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -115,17 +125,35 @@ void drawBackground()
     glBindTexture(GL_TEXTURE_2D, textureID);
     glColor3f(1.0f, 1.0f, 1.0f);
 
-    /* Quad lebih besar dari viewport: -OVER s/d 1+OVER
-       Texcoord tetap 0..1 → tidak ada tiling, tidak ada seam */
+    float left, right, bottom, top;
+
+    if (aspect >= 1.0f)
+    {
+        left = -aspect - OVER;
+        right = aspect + OVER;
+        bottom = -1.0f - OVER;
+        top = 1.0f + OVER;
+    }
+    else
+    {
+        left = -1.0f - OVER;
+        right = 1.0f + OVER;
+        bottom = -1.0f / aspect - OVER;
+        top = 1.0f / aspect + OVER;
+    }
+
     glBegin(GL_QUADS);
     glTexCoord2f(0.0f, 0.0f);
-    glVertex2f(-OVER, -OVER);
+    glVertex2f(left, bottom);
+
     glTexCoord2f(1.0f, 0.0f);
-    glVertex2f(1.0f + OVER, -OVER);
+    glVertex2f(right, bottom);
+
     glTexCoord2f(1.0f, 1.0f);
-    glVertex2f(1.0f + OVER, 1.0f + OVER);
+    glVertex2f(right, top);
+
     glTexCoord2f(0.0f, 1.0f);
-    glVertex2f(-OVER, 1.0f + OVER);
+    glVertex2f(left, top);
     glEnd();
 
     glDisable(GL_TEXTURE_2D);
@@ -280,11 +308,6 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     drawBackground();
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(60.0, (double)WIN_W / WIN_H, 0.1, 200.0);
-
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
@@ -497,6 +520,24 @@ void specialKey(int key, int x, int y)
         gLane--;
 }
 
+void reshape(int w, int h)
+{
+    if (h == 0)
+        h = 1;
+
+    WIN_W = w;
+    WIN_H = h;
+
+    glViewport(0, 0, w, h);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    gluPerspective(60.0, (float)w / h, 0.1, 200.0);
+
+    glMatrixMode(GL_MODELVIEW);
+}
+
 /* -- Main --------------------------------- */
 int main(int argc, char **argv)
 {
@@ -518,6 +559,7 @@ int main(int argc, char **argv)
     glutKeyboardFunc(keyboard);
     glutKeyboardUpFunc(keyboardUp);
     glutSpecialFunc(specialKey);
+    glutReshapeFunc(reshape);
     glutTimerFunc(16, update, 0);
 
     glutMainLoop();

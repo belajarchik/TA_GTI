@@ -1,24 +1,32 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "Compile + Run GLUT",
-      "type": "shell",
-      "command": "g++ *.cpp -o \"${fileBasenameNoExtension}\" -framework GLUT -framework OpenGL -Wno-deprecated-declarations && \"${fileDirname}/${fileBasenameNoExtension}\"",
-      "options": {
-        "cwd": "${fileDirname}"
-      },
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "new",
-        "clear": true,
-        "focus": true
-      },
-      "problemMatcher": []
-    }
-  ]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build OpenGL",
+            "type": "shell",
+            "command": "C:\\msys64\\mingw64\\bin\\g++.exe",
+            "args": [
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe",
+
+                "-IC:\\msys64\\mingw64\\include",
+                "-LC:\\msys64\\mingw64\\lib",
+
+                "-lglfw3",
+                "-lglew32",
+                "-lopengl32",
+                "-lgdi32"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"]
+        }
+    ]
 }
