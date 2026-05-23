@@ -4,7 +4,10 @@
     {
       "label": "Compile + Run GLUT",
       "type": "shell",
-      "command": "g++ \"${file}\" -o \"${fileDirname}/${fileBasenameNoExtension}\" -framework GLUT -framework OpenGL -Wno-deprecated-declarations && \"${fileDirname}/${fileBasenameNoExtension}\"",
+      "command": "g++ *.cpp -o \"${fileBasenameNoExtension}\" -framework GLUT -framework OpenGL -Wno-deprecated-declarations && \"${fileDirname}/${fileBasenameNoExtension}\"",
+      "options": {
+        "cwd": "${fileDirname}"
+      },
       "group": {
         "kind": "build",
         "isDefault": true

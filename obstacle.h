@@ -4,7 +4,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
-#include <GL/glut.h>
+#include <GLUT/glut.h>
 #include <math.h>
 
 /* PAKSA DECLARE */
@@ -17,12 +17,12 @@ extern "C"
 // max dari obstacle
 #define MAX_OBS 10
 
-// Ukuran shadow 
-#define SHADOW_W  0.8f   // setengah lebar shadow 
-#define SHADOW_H  1.2f   // setengah panjang shadow 
-#define SHADOW_Y  0.01f  // sedikit di atas lantai  
+// Ukuran shadow
+#define SHADOW_W 0.8f  // setengah lebar shadow
+#define SHADOW_H 1.2f  // setengah panjang shadow
+#define SHADOW_Y 0.01f // sedikit di atas lantai
 
-// obstacle 
+// obstacle
 typedef struct
 {
     float x, z;
@@ -31,9 +31,9 @@ typedef struct
 
 extern float LANES[3];
 extern Obs gObs[MAX_OBS];
-extern float gSpawnTimer;     
-extern float gSpawnInterval;  
-extern float gLastTime;       
+extern float gSpawnTimer;
+extern float gSpawnInterval;
+extern float gLastTime;
 extern float gDeltaTime;
 extern int gFrame;
 

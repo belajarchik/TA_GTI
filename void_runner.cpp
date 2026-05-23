@@ -1,18 +1,10 @@
-/*
-    Kontrol:
-      Arrow Left / A  : Pindah kiri
-      Arrow Right / D : Pindah kanan
-      SPACE / ENTER   : Mulai / Restart
-      ESC             : Keluar
-*/
-
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
-//#include <GL/gl.h>
-//#include <GL/glu.h>
-#include <GL/glut.h>
+// #include <GL/gl.h>
+// #include <GL/glu.h>
+#include <GLUT/glut.h>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
@@ -36,9 +28,24 @@ extern "C"
 int WIN_W = 800;
 int WIN_H = 600;
 
+// Variabel
+
+// Waktu
+float gStartTime = 0.0f;
+float gFinishTime = 0.0f;
+
+// Lane
 float LANES[3] = {-3.0f, 0.0f, 3.0f};
 
-// State game
+// Animasi WIN
+float gWinAnimTimer = 0.0f;
+const float WIN_ANIM_DUR = 2.8f;
+
+/* -- Kamera bebas (WASD) ------------------ */
+float gCamYaw = 0.0f;   /* geser pandangan kiri/kanan */
+float gCamPitch = 0.0f; /* geser pandangan atas/bawah */
+bool gKeys[256] = {};
+
 int gScore = 0;
 int gFrame = 0;
 float gSpeed = 5.0f;
@@ -47,53 +54,82 @@ Obs gObs[MAX_OBS];
 int gLane = 1;
 float gPlayerX = 0.0f;
 
-GLuint textureID; 
+GLuint textureID;
 
 //  Memasukan gambar ke program
-void initTexture() {
+void initTexture()
+{
     // Membaca file gambar menggunakan fungsi milik dosen
-    Image* image = loadBMP("galaxy.bmp"); 
-    
+    Image *image = loadBMP("galaxy.bmp");
+
     // Mendaftarkan tekstur ke OpenGL
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
-    
+
     // Mengatur agar gambar terlihat tajam dan pas dengan layar
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
     // Mengirim data piksel gambar ke GPU
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height, 
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height,
                  0, GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
-                 
+
     delete image; // Menghapus memori gambar sementara karena sudah disimpan di GPU
 }
 
 // Fungsi khusus untuk menggambar background galaksi 2D
-void drawBackground() {
+void drawBackground()
+{
+    /* Quad digambar 20% lebih besar dari layar di setiap sisi.
+       Yang bergeser adalah posisi quad-nya (glTranslatef),
+       bukan texcoord — sehingga tidak perlu tiling dan tidak ada seam. */
+    const float OVER = 0.20f;
+
+    /* Hitung pan dari kamera, dikurung agar tidak melewati batas quad */
+    float panX = -gCamYaw * (OVER / 4.5f);
+    float panY = gCamPitch * (OVER / 4.5f);
+    if (panX > OVER)
+        panX = OVER;
+    if (panX < -OVER)
+        panX = -OVER;
+    if (panY > OVER)
+        panY = OVER;
+    if (panY < -OVER)
+        panY = -OVER;
+
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    gluOrtho2D(0.0, 1.0, 0.0, 1.0); // Membuat koordinat layar datar (0,0) sampai (1,1)
-    
+    gluOrtho2D(0.0, 1.0, 0.0, 1.0);
+
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
-    
-    glDisable(GL_DEPTH_TEST); // Matikan depth test supaya menempel di paling belakang
-    glEnable(GL_TEXTURE_2D);  // Aktifkan mode tekstur 2D seperti contoh dosen
-    glBindTexture(GL_TEXTURE_2D, textureID); // Ikat ID tekstur galaxy.bmp
+    glTranslatef(panX, panY, 0.0f); /* geser quad, bukan texcoord */
 
-    glColor3f(1.0f, 1.0f, 1.0f); // Reset warna ke putih murni agar gambar tidak gelap
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glColor3f(1.0f, 1.0f, 1.0f);
+
+    /* Quad lebih besar dari viewport: -OVER s/d 1+OVER
+       Texcoord tetap 0..1 → tidak ada tiling, tidak ada seam */
     glBegin(GL_QUADS);
-        glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, 0.0f); // Kiri bawah
-        glTexCoord2f(1.0f, 0.0f); glVertex2f(1.0f, 0.0f); // Kanan bawah
-        glTexCoord2f(1.0f, 1.0f); glVertex2f(1.0f, 1.0f); // Kanan atas
-        glTexCoord2f(0.0f, 1.0f); glVertex2f(0.0f, 1.0f); // Kiri atas
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex2f(-OVER, -OVER);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex2f(1.0f + OVER, -OVER);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex2f(1.0f + OVER, 1.0f + OVER);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex2f(-OVER, 1.0f + OVER);
     glEnd();
 
-    glDisable(GL_TEXTURE_2D); // Matikan tekstur kembali
-    glEnable(GL_DEPTH_TEST);  // Hidupkan depth test lagi untuk objek 3D
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_DEPTH_TEST);
 
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
@@ -118,6 +154,11 @@ void initGame()
     gPlayerX = LANES[1];
     gSpawnTimer = 0.0f;
     gSpawnInterval = 1.5f;
+    gWinAnimTimer = 0.0f;
+    gStartTime = (float)glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
+    gFinishTime = 0.0f;
+    gCamYaw = 0.0f;
+    gCamPitch = 0.0f;
     for (i = 0; i < MAX_OBS; i++)
         gObs[i].active = 0;
 }
@@ -130,7 +171,10 @@ int checkHit()
     {
         if (!gObs[i].active)
             continue;
-        if (myabs(gObs[i].z - 1.8f) < 1.7f && myabs(gObs[i].x - gPlayerX) < 0.9f)
+
+        /* Z: half-length roket (1.63) + radius asteroid (0.9) = 2.5
+           X: half-width fins  (0.55) + radius asteroid (0.9) = 1.3  */
+        if (myabs(gObs[i].z - 1.8f) < 1.5f && myabs(gObs[i].x - gPlayerX) < 1.3f)
             return 1;
     }
     return 0;
@@ -234,30 +278,76 @@ void display()
     int i;
     glClearColor(0.05f, 0.05f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
+
     drawBackground();
 
-    /* Proyeksi perspektif */
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    
     gluPerspective(60.0, (double)WIN_W / WIN_H, 0.1, 200.0);
 
-    /* Kamera mengikuti player sedikit */
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(gPlayerX * 0.25 + gCamShake, 4.0, -6.0, gPlayerX * 0.1, 0.0, 25.0, 0.0, 1.0, 0.0);
 
-    drawRoad();
+    /* Kamera — WIN_ANIM mendongak secara bertahap */
+    float camEyeY = 4.0f;
+    float camLookY = gCamPitch;
+    if (gState == WIN_ANIM)
+    {
+        float ease = (gWinAnimTimer / WIN_ANIM_DUR);
+        ease *= ease;
+        camEyeY += ease * 2.5f;
+        camLookY += ease * 4.0f;
+    }
+    gluLookAt(gPlayerX * 0.25 + gCamShake, camEyeY, -6.0,
+              gPlayerX * 0.1 + gCamYaw, camLookY, 25.0,
+              0.0, 1.0, 0.0);
 
+    drawRoad(); /* digambar SATU kali di sini */
+
+    /* --- STATE PLAYING / DEAD --- */
     if (gState == PLAYING || gState == DEAD)
     {
         drawPlayer();
         for (i = 0; i < MAX_OBS; i++)
-            if (gObs[i].active) {
-            	drawObsShadow(gObs[i].x, gObs[i].z, i);
+            if (gObs[i].active)
+            {
+                drawObsShadow(gObs[i].x, gObs[i].z, i);
                 drawObstacle(gObs[i].x, gObs[i].z, i);
-			}
+            }
+        drawHUD();
+    }
+
+    /* --- STATE WIN_ANIM: roket terbang --- */
+    if (gState == WIN_ANIM)
+    {
+        float t = gWinAnimTimer / WIN_ANIM_DUR;
+        float ease = t * t;
+        float offY = ease * 14.0f;
+        float offZ = ease * 8.0f;
+        float pitch = -ease * 65.0f;
+        float sc = 1.0f - t * 0.92f;
+        if (sc < 0.03f)
+            sc = 0.03f;
+
+        /* Asteroid beku tetap terlihat */
+        for (i = 0; i < MAX_OBS; i++)
+            if (gObs[i].active)
+            {
+                drawObsShadow(gObs[i].x, gObs[i].z, i);
+                drawObstacle(gObs[i].x, gObs[i].z, i);
+            }
+
+        /* Roket dengan transform animasi */
+        float savedX = gPlayerX;
+        gPlayerX = 0.0f;
+        glPushMatrix();
+        glTranslatef(savedX, offY, offZ);
+        glRotatef(pitch, 1.0f, 0.0f, 0.0f);
+        glScalef(sc, sc, sc);
+        drawPlayer();
+        glPopMatrix();
+        gPlayerX = savedX;
+
         drawHUD();
     }
 
@@ -265,6 +355,8 @@ void display()
         drawMenu();
     if (gState == DEAD)
         drawDead();
+    if (gState == WIN)
+        drawWin(gScore, gFinishTime - gStartTime);
 
     glutSwapBuffers();
 }
@@ -292,10 +384,18 @@ void update(int val)
         if (gSpawnInterval < 0.6f)
             gSpawnInterval = 0.6f;
 
+        /* --- CEK MENANG --- */
+        if (gScore >= 1000 && gState == PLAYING)
+        {
+            gFinishTime = (float)glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
+            gWinAnimTimer = 0.0f;
+            gState = WIN_ANIM;
+        }
+
         /* Gerak player smooth ke lane target */
         targetX = LANES[gLane];
         diff = targetX - gPlayerX;
-        gPlayerX += diff * 10.0f * gDeltaTime;
+        gPlayerX += diff * 15.0f * gDeltaTime;
         if (myabs(diff) < 0.01f)
             gPlayerX = targetX;
 
@@ -303,6 +403,28 @@ void update(int val)
 
         // redam biar balik normal
         gCamShake *= 0.9f;
+
+        /* -- Gerak kamera bebas (WASD) -- */
+        float cs = 4.5f * gDeltaTime;
+
+        if (gKeys['w'] || gKeys['W'])
+            gCamPitch += cs;
+        if (gKeys['s'] || gKeys['S'])
+            gCamPitch -= cs;
+        if (gKeys['a'] || gKeys['A'])
+            gCamYaw -= cs;
+        if (gKeys['d'] || gKeys['D'])
+            gCamYaw += cs;
+
+        /* Batas pandangan agar tidak terlalu jauh */
+        if (gCamPitch > 6.0f)
+            gCamPitch = 6.0f;
+        if (gCamPitch < -6.5f)
+            gCamPitch = -6.5f;
+        if (gCamYaw > 10.5f)
+            gCamYaw = 10.5f;
+        if (gCamYaw < -10.5f)
+            gCamYaw = -10.5f;
 
         /* Gerak obstacle ke depan */
         for (i = 0; i < MAX_OBS; i++)
@@ -328,11 +450,20 @@ void update(int val)
     }
 
     glutPostRedisplay();
+
+    if (gState == WIN_ANIM)
+    {
+        gWinAnimTimer += gDeltaTime;
+        if (gWinAnimTimer >= WIN_ANIM_DUR)
+            gState = WIN;
+    }
 }
 
 /* -- Input keyboard ----------------------- */
 void keyboard(unsigned char key, int x, int y)
 {
+    gKeys[key] = true;
+
     switch (key)
     {
     case 27:
@@ -340,25 +471,20 @@ void keyboard(unsigned char key, int x, int y)
         break;
     case ' ':
     case 13:
-        if (gState != PLAYING)
+        if (gState == MENU || gState == DEAD || gState == WIN)
             initGame();
         break;
     case 'r':
     case 'R':
-        if (gState == DEAD)
+        if (gState == DEAD || gState == WIN)
             initGame();
         break;
-    case 'd':
-    case 'D':
-        if (gState == PLAYING && gLane > 0)
-            gLane--;
-        break;
-    case 'a':
-    case 'A':
-        if (gState == PLAYING && gLane < 2)
-            gLane++;
-        break;
     }
+}
+
+void keyboardUp(unsigned char key, int x, int y)
+{
+    gKeys[key] = false;
 }
 
 void specialKey(int key, int x, int y)
@@ -383,13 +509,14 @@ int main(int argc, char **argv)
     glutCreateWindow("Void Runner - OpenGL GLUT");
 
     glEnable(GL_DEPTH_TEST);
-    
+
     initTexture();
 
     gLastTime = (float)glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
 
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
+    glutKeyboardUpFunc(keyboardUp);
     glutSpecialFunc(specialKey);
     glutTimerFunc(16, update, 0);
 
