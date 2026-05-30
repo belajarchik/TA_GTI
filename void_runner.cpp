@@ -301,8 +301,7 @@ void display()
     gluLookAt(
         gPlayerX * 0.25 + gCamShake, camEyeY, -6.0,
         gPlayerX * 0.1 + gCamYaw, camLookY, 25.0,
-        0.0, 1.0, 0.0
-    );
+        0.0, 1.0, 0.0);
 
     drawRoad(); /* digambar SATU kali di sini */
 
@@ -508,7 +507,7 @@ int main(int argc, char **argv)
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(WIN_W, WIN_H);
     glutInitWindowPosition(150, 80);
-    glutCreateWindow("Void Runner - OpenGL GLUT");
+    glutCreateWindow("Hypernova Escape");
 
     glEnable(GL_DEPTH_TEST);
 
