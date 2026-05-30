@@ -298,9 +298,11 @@ void display()
         camEyeY += ease * 2.5f;
         camLookY += ease * 4.0f;
     }
-    gluLookAt(gPlayerX * 0.25 + gCamShake, camEyeY, -6.0,
-              gPlayerX * 0.1 + gCamYaw, camLookY, 25.0,
-              0.0, 1.0, 0.0);
+    gluLookAt(
+        gPlayerX * 0.25 + gCamShake, camEyeY, -6.0,
+        gPlayerX * 0.1 + gCamYaw, camLookY, 25.0,
+        0.0, 1.0, 0.0
+    );
 
     drawRoad(); /* digambar SATU kali di sini */
 
