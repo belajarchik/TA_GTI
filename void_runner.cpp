@@ -3,8 +3,8 @@
 #endif
 
 // #include <GL/gl.h>
-#include <GL/freeglut.h>
-// #include <GL/glut.h>
+// #include <GL/freeglut.h>
+#include <GL/glut.h>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
@@ -74,8 +74,8 @@ void initTexture()
     #define GL_CLAMP_TO_EDGE 0x812F
     #endif
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
     // Mengirim data piksel gambar ke GPU
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height,
