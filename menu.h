@@ -5,8 +5,8 @@
 #include <windows.h>
 #endif
 
-// #include <GL/glut.h>
-#include <GL/freeglut.h>
+#include <GL/glut.h>
+// #include <GL/freeglut.h>
 #include <stdio.h>
 
 /* ── State Game ── */
