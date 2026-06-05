@@ -11,31 +11,37 @@ void drawBox(float w, float h, float d)
     float hw = w * 0.5f, hh = h * 0.5f, hd = d * 0.5f;
     glBegin(GL_QUADS);
     /* depan */
+    glNormal3f(0.0f, 0.0f, 1.0f);
     glVertex3f(-hw, -hh, hd);
     glVertex3f(hw, -hh, hd);
     glVertex3f(hw, hh, hd);
     glVertex3f(-hw, hh, hd);
     /* belakang */
+    glNormal3f(0.0f, 0.0f, -1.0f);
     glVertex3f(hw, -hh, -hd);
     glVertex3f(-hw, -hh, -hd);
     glVertex3f(-hw, hh, -hd);
     glVertex3f(hw, hh, -hd);
     /* kiri */
+    glNormal3f(-1.0f, 0.0f, 0.0f);
     glVertex3f(-hw, -hh, -hd);
     glVertex3f(-hw, -hh, hd);
     glVertex3f(-hw, hh, hd);
     glVertex3f(-hw, hh, -hd);
     /* kanan */
+    glNormal3f(1.0f, 0.0f, 0.0f);
     glVertex3f(hw, -hh, hd);
     glVertex3f(hw, -hh, -hd);
     glVertex3f(hw, hh, -hd);
     glVertex3f(hw, hh, hd);
     /* atas */
+    glNormal3f(0.0f, 1.0f, 0.0f);
     glVertex3f(-hw, hh, hd);
     glVertex3f(hw, hh, hd);
     glVertex3f(hw, hh, -hd);
     glVertex3f(-hw, hh, -hd);
     /* bawah */
+    glNormal3f(0.0f, -1.0f, 0.0f);
     glVertex3f(-hw, -hh, -hd);
     glVertex3f(hw, -hh, -hd);
     glVertex3f(hw, -hh, hd);

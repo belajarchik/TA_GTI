@@ -57,6 +57,36 @@ float gPlayerX = 0.0f;
 
 GLuint textureID;
 
+void initLighting()
+{
+    GLfloat ambient[]  = {0.18f, 0.18f, 0.24f, 1.0f};
+    GLfloat diffuse[]  = {0.90f, 0.88f, 0.78f, 1.0f};
+    GLfloat specular[] = {0.70f, 0.72f, 0.85f, 1.0f};
+    GLfloat matSpec[]  = {0.45f, 0.45f, 0.50f, 1.0f};
+    GLfloat shininess[] = {36.0f};
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, matSpec);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
+
+    glShadeModel(GL_SMOOTH);
+    glEnable(GL_NORMALIZE);
+}
+
+void updateLighting()
+{
+    GLfloat lightPos[] = {-4.0f, 7.0f, -3.0f, 1.0f};
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
+}
+
 /* -- Tembakan & efek hancur -------------- */
 #define MAX_BULLETS 16
 #define MAX_EXPLOSIONS 18
@@ -117,6 +147,8 @@ void initTexture()
 // Fungsi khusus untuk menggambar background galaksi 2D
 void drawBackground()
 {
+    GLboolean lightingWasOn = glIsEnabled(GL_LIGHTING);
+
     /* Quad digambar 20% lebih besar dari layar di setiap sisi.
        Yang bergeser adalah posisi quad-nya (glTranslatef),
        bukan texcoord — sehingga tidak perlu tiling dan tidak ada seam. */
@@ -145,6 +177,7 @@ void drawBackground()
     glTranslatef(panX, panY, 0.0f); /* geser quad, bukan texcoord */
 
     glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textureID);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -163,6 +196,8 @@ void drawBackground()
     glEnd();
 
     glDisable(GL_TEXTURE_2D);
+    if (lightingWasOn)
+        glEnable(GL_LIGHTING);
     glEnable(GL_DEPTH_TEST);
 
     glMatrixMode(GL_PROJECTION);
@@ -268,6 +303,7 @@ void drawBullet(float x, float z)
     glTranslatef(x, 0.10f, z);
     glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
 
+    glDisable(GL_LIGHTING);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
@@ -279,6 +315,7 @@ void drawBullet(float x, float z)
     glutSolidSphere(0.18f, 12, 8);
 
     glDisable(GL_BLEND);
+    glEnable(GL_LIGHTING);
     glPopMatrix();
 }
 
@@ -289,6 +326,7 @@ void drawExplosion(float x, float z, float timer)
     float fade = 1.0f - t;
     float radius = 0.25f + t * 1.8f;
 
+    glDisable(GL_LIGHTING);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
@@ -301,6 +339,7 @@ void drawExplosion(float x, float z, float timer)
     glPopMatrix();
 
     glDisable(GL_BLEND);
+    glEnable(GL_LIGHTING);
 
     for (i = 0; i < 8; i++)
     {
@@ -325,6 +364,7 @@ void drawShipExplosion()
     float t = clamp01(gShipExplosionTimer / 1.6f);
     float fade = 1.0f - t;
 
+    glDisable(GL_LIGHTING);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glPushMatrix();
@@ -335,6 +375,7 @@ void drawShipExplosion()
     glutSolidSphere(0.25f + t * 0.8f, 14, 8);
     glPopMatrix();
     glDisable(GL_BLEND);
+    glEnable(GL_LIGHTING);
 
     for (i = 0; i < MAX_SHIP_PARTS; i++)
     {
@@ -512,10 +553,12 @@ void begin2D()
     glPushMatrix();
     glLoadIdentity();
     glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
 }
 
 void end2D()
 {
+    glEnable(GL_LIGHTING);
     glEnable(GL_DEPTH_TEST);
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
@@ -586,6 +629,8 @@ void display()
         gPlayerX * 0.25 + gCamShake, camEyeY, -6.0,
         gPlayerX * 0.1 + gCamYaw, camLookY, 25.0,
         0.0, 1.0, 0.0);
+
+    updateLighting();
 
     drawRoad(); /* digambar SATU kali di sini */
 
@@ -827,6 +872,7 @@ int main(int argc, char **argv)
     glutCreateWindow("Hypernova Escape");
 
     glEnable(GL_DEPTH_TEST);
+    initLighting();
 
     initTexture();
 

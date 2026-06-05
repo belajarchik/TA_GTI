@@ -64,26 +64,32 @@ void badan(float wF, float wB, float hT, float zFront, float zBack)
     glBegin(GL_QUADS);
 
     // Atas
+    glNormal3f(0.0f, 1.0f, 0.0f);
     glVertex3fv(fLU); glVertex3fv(fRU);
     glVertex3fv(bRU); glVertex3fv(bLU);
 
     // Bawah
+    glNormal3f(0.0f, -1.0f, 0.0f);
     glVertex3fv(fLD); glVertex3fv(fRD);
     glVertex3fv(bRD); glVertex3fv(bLD);
 
     // Kiri
+    glNormal3f(-1.0f, 0.0f, 0.0f);
     glVertex3fv(fLU); glVertex3fv(fLD);
     glVertex3fv(bLD); glVertex3fv(bLU);
 
     // Kanan
+    glNormal3f(1.0f, 0.0f, 0.0f);
     glVertex3fv(fRU); glVertex3fv(fRD);
     glVertex3fv(bRD); glVertex3fv(bRU);
 
     // Depan 
+    glNormal3f(0.0f, 0.0f, -1.0f);
     glVertex3fv(fLU); glVertex3fv(fRU);
     glVertex3fv(fRD); glVertex3fv(fLD);
 
     // Belakang 
+    glNormal3f(0.0f, 0.0f, 1.0f);
     glVertex3fv(bLU); glVertex3fv(bRU);
     glVertex3fv(bRD); glVertex3fv(bLD);
 
@@ -107,12 +113,14 @@ void sayap(float span, float zLE, float zTE, float zTip, float chordTip, float h
     glBegin(GL_QUADS);
 
     // Atas (Y = +h)
+    glNormal3f(0.0f, 1.0f, 0.0f);
     glVertex3f(A[0], h, A[2]);
     glVertex3f(B[0], h, B[2]);
     glVertex3f(C[0], h, C[2]);
     glVertex3f(D[0], h, D[2]);
 
     // Bawah (Y = -h)
+    glNormal3f(0.0f, -1.0f, 0.0f);
     glVertex3f(A[0],-h, A[2]);
     glVertex3f(B[0],-h, B[2]);
     glVertex3f(C[0],-h, C[2]);
@@ -122,25 +130,28 @@ void sayap(float span, float zLE, float zTE, float zTip, float chordTip, float h
 
     // Leading edge (depan miring)
     glBegin(GL_QUADS);
+    glNormal3f(0.0f, 0.0f, -1.0f);
     glVertex3f(A[0], h, A[2]); glVertex3f(B[0], h, B[2]);
     glVertex3f(B[0],-h, B[2]); glVertex3f(A[0],-h, A[2]);
     glEnd();
 
     // Trailing edge (belakang miring)
     glBegin(GL_QUADS);
+    glNormal3f(0.0f, 0.0f, 1.0f);
     glVertex3f(D[0], h, D[2]); glVertex3f(C[0], h, C[2]);
     glVertex3f(C[0],-h, C[2]); glVertex3f(D[0],-h, D[2]);
     glEnd();
 
     // Wingtip (ujung sayap)
     glBegin(GL_QUADS);
+    glNormal3f(1.0f, 0.0f, 0.0f);
     glVertex3f(B[0], h, B[2]); glVertex3f(C[0], h, C[2]);
     glVertex3f(C[0],-h, C[2]); glVertex3f(B[0],-h, B[2]);
     glEnd();
 }
 
 // ---------------------------------------------
-//  ENGINE NOZZLE  –  dua nosel di buritan
+//  ENGINE NOZZLE     dua nosel di buritan
 // ---------------------------------------------
 void nozzle(float offsetX)
 {
