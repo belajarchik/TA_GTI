@@ -59,10 +59,10 @@ GLuint textureID;
 
 void initLighting()
 {
-    GLfloat ambient[]  = {0.18f, 0.18f, 0.24f, 1.0f};
-    GLfloat diffuse[]  = {0.90f, 0.88f, 0.78f, 1.0f};
+    GLfloat ambient[] = {0.18f, 0.18f, 0.24f, 1.0f};
+    GLfloat diffuse[] = {0.90f, 0.88f, 0.78f, 1.0f};
     GLfloat specular[] = {0.70f, 0.72f, 0.85f, 1.0f};
-    GLfloat matSpec[]  = {0.45f, 0.45f, 0.50f, 1.0f};
+    GLfloat matSpec[] = {0.45f, 0.45f, 0.50f, 1.0f};
     GLfloat shininess[] = {36.0f};
 
     glEnable(GL_LIGHTING);
@@ -124,7 +124,7 @@ float gShipExplosionTimer = 0.0f;
 void initTexture()
 {
     // Membaca file gambar menggunakan fungsi milik dosen
-    Image *image = loadBMP("galaxy.bmp");
+    Image *image = loadBMP("assets/galaxy.bmp");
 
     // Mendaftarkan tekstur ke OpenGL
     glGenTextures(1, &textureID);
@@ -248,7 +248,7 @@ void fireBullet()
             gBullets[i].x = gPlayerX;
             gBullets[i].z = 3.0f;
             gBullets[i].active = 1;
-            gFireCooldown = 0.18f;
+            gFireCooldown = 3.0f;
             return;
         }
     }
@@ -274,11 +274,7 @@ void spawnShipExplosion()
 {
     int i;
     float dirs[MAX_SHIP_PARTS][3] = {
-        {-1.6f, 1.0f, -1.2f}, {-0.9f, 1.5f, 0.4f}, {0.8f, 1.4f, -0.5f},
-        {1.5f, 0.9f, 1.0f}, {-0.4f, 1.9f, 1.5f}, {0.3f, 1.6f, -1.6f},
-        {-1.2f, 0.6f, 1.4f}, {1.2f, 0.7f, -1.4f}, {-0.2f, 2.1f, 0.1f},
-        {0.6f, 1.2f, 1.9f}, {-0.7f, 1.1f, -1.8f}, {1.8f, 0.8f, 0.0f},
-        {-1.8f, 0.8f, 0.0f}, {0.0f, 2.2f, 1.0f}};
+        {-1.6f, 1.0f, -1.2f}, {-0.9f, 1.5f, 0.4f}, {0.8f, 1.4f, -0.5f}, {1.5f, 0.9f, 1.0f}, {-0.4f, 1.9f, 1.5f}, {0.3f, 1.6f, -1.6f}, {-1.2f, 0.6f, 1.4f}, {1.2f, 0.7f, -1.4f}, {-0.2f, 2.1f, 0.1f}, {0.6f, 1.2f, 1.9f}, {-0.7f, 1.1f, -1.8f}, {1.8f, 0.8f, 0.0f}, {-1.8f, 0.8f, 0.0f}, {0.0f, 2.2f, 1.0f}};
 
     gShipExplosionTimer = 0.0f;
     for (i = 0; i < MAX_SHIP_PARTS; i++)

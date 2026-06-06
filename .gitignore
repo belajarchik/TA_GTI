@@ -1,0 +1,9 @@
+# Hasil kompilasi
+*.o
+*.exe
+*.a
+
+# File IDE
+.vscode/
+*.dev
+*.layout
