@@ -144,13 +144,13 @@ void drawAsteroid(float x, float z, int id)
     glPopMatrix();
 }
 
-// Wrapper 
+// Wrapper
 void drawObstacle(float x, float z, int id)
 {
     drawAsteroid(x, z, id);
 }
 
-// Spawn obstacle 
+// Spawn obstacle
 void spawnObs()
 {
     int i;
@@ -168,7 +168,7 @@ void spawnObs()
 
 void drawObsShadow(float x, float z, int id)
 {
-    float scale  = 0.85f + (id % 4) * 0.1f;
+    float scale = 0.85f + (id % 4) * 0.1f;
     float shadowY = -0.28f;
 
     glEnable(GL_BLEND);
@@ -180,21 +180,21 @@ void drawObsShadow(float x, float z, int id)
     float h1 = (0.80f + 0.15f) * scale;
     glColor4f(0.0f, 0.0f, 0.0f, 0.65f);
     glBegin(GL_QUADS);
-        glVertex3f(x - w1, shadowY, z - h1);
-        glVertex3f(x + w1, shadowY, z - h1);
-        glVertex3f(x + w1, shadowY, z + h1);
-        glVertex3f(x - w1, shadowY, z + h1);
+    glVertex3f(x - w1, shadowY, z - h1);
+    glVertex3f(x + w1, shadowY, z - h1);
+    glVertex3f(x + w1, shadowY, z + h1);
+    glVertex3f(x - w1, shadowY, z + h1);
     glEnd();
 
-    // luar lebih besar, lebih transparan 
+    // luar lebih besar, lebih transparan
     float w2 = w1 * 1.6f;
     float h2 = h1 * 1.6f;
     glColor4f(0.0f, 0.0f, 0.0f, 0.22f);
     glBegin(GL_QUADS);
-        glVertex3f(x - w2, shadowY, z - h2);
-        glVertex3f(x + w2, shadowY, z - h2);
-        glVertex3f(x + w2, shadowY, z + h2);
-        glVertex3f(x - w2, shadowY, z + h2);
+    glVertex3f(x - w2, shadowY, z - h2);
+    glVertex3f(x + w2, shadowY, z - h2);
+    glVertex3f(x + w2, shadowY, z + h2);
+    glVertex3f(x - w2, shadowY, z + h2);
     glEnd();
 
     // terluar tipis
@@ -202,10 +202,10 @@ void drawObsShadow(float x, float z, int id)
     float h3 = h1 * 2.2f;
     glColor4f(0.0f, 0.0f, 0.0f, 0.08f);
     glBegin(GL_QUADS);
-        glVertex3f(x - w3, shadowY, z - h3);
-        glVertex3f(x + w3, shadowY, z - h3);
-        glVertex3f(x + w3, shadowY, z + h3);
-        glVertex3f(x - w3, shadowY, z + h3);
+    glVertex3f(x - w3, shadowY, z - h3);
+    glVertex3f(x + w3, shadowY, z - h3);
+    glVertex3f(x + w3, shadowY, z + h3);
+    glVertex3f(x - w3, shadowY, z + h3);
     glEnd();
 
     glDepthMask(GL_TRUE);

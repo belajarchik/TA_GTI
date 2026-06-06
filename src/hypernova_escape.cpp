@@ -123,7 +123,7 @@ float gShipExplosionTimer = 0.0f;
 //  Memasukan gambar ke program
 void initTexture()
 {
-    // Membaca file gambar menggunakan fungsi milik dosen
+    // Membaca file gambar
     Image *image = loadBMP("assets/galaxy.bmp");
 
     // Mendaftarkan tekstur ke OpenGL
@@ -149,10 +149,7 @@ void drawBackground()
 {
     GLboolean lightingWasOn = glIsEnabled(GL_LIGHTING);
 
-    /* Quad digambar 20% lebih besar dari layar di setiap sisi.
-       Yang bergeser adalah posisi quad-nya (glTranslatef),
-       bukan texcoord — sehingga tidak perlu tiling dan tidak ada seam. */
-    const float OVER = 0.20f;
+    const float OVER = 0.20f; // untuk overscan
 
     /* Hitung pan dari kamera, dikurung agar tidak melewati batas quad */
     float panX = -gCamYaw * (OVER / 4.5f);
@@ -166,24 +163,26 @@ void drawBackground()
     if (panY < -OVER)
         panY = -OVER;
 
+    // Setup Kamera 2D (Proyeksi Ortografis)
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
     gluOrtho2D(0.0, 1.0, 0.0, 1.0);
 
+    // Efek Pergeseran(Panning)
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
     glTranslatef(panX, panY, 0.0f); /* geser quad, bukan texcoord */
 
+    // Pengkondisian Lingkungan Render Background
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textureID);
     glColor3f(1.0f, 1.0f, 1.0f);
 
-    /* Quad lebih besar dari viewport: -OVER s/d 1+OVER
-       Texcoord tetap 0..1 → tidak ada tiling, tidak ada seam */
+    // Menggambar Quad dengan Teknik Overscan
     glBegin(GL_QUADS);
     glTexCoord2f(0.0f, 0.0f);
     glVertex2f(-OVER, -OVER);
@@ -195,6 +194,7 @@ void drawBackground()
     glVertex2f(-OVER, 1.0f + OVER);
     glEnd();
 
+    // Pembersihan dan Pengembalian State kembali ke 3d
     glDisable(GL_TEXTURE_2D);
     if (lightingWasOn)
         glEnable(GL_LIGHTING);
@@ -206,7 +206,7 @@ void drawBackground()
     glPopMatrix();
 }
 
-/* -- Fungsi fabsf sederhana --------------- */
+/* -- Fungsi absolut  --------------- */
 float myabs(float v) { return v < 0 ? -v : v; }
 
 float gCamShake = 0.0f;
@@ -484,7 +484,7 @@ void initGame()
         gObs[i].active = 0;
 }
 
-/* -- Cek tabrakan ------------------------- */
+// Cek collision
 int checkHit()
 {
     int i;
@@ -493,15 +493,14 @@ int checkHit()
         if (!gObs[i].active)
             continue;
 
-        /* Z: half-length roket (1.63) + radius asteroid (0.9) = 2.5
-           X: half-width fins  (0.55) + radius asteroid (0.9) = 1.3  */
+        /* Z: half-length pesawat (1.63) + radius asteroid (0.9) = 2.5 -> dikecilkan menjadi 1.5 agar tidak terlihat aneh
+           X: half-width sayap  (0.55) + radius asteroid (0.9) = 1.3  */
         if (myabs(gObs[i].z - 1.8f) < 1.5f && myabs(gObs[i].x - gPlayerX) < 1.3f)
             return 1;
     }
     return 0;
 }
 
-/* -- Gambar jalan ------------------------- */
 void drawRoad()
 {
     float z, zz, offset;
