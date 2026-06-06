@@ -16,16 +16,21 @@ Sebelum memulai, pastikan sistem Anda sudah memiliki:
 ```bash
 git clone [https://github.com/belajarchik/TA_GTI](https://github.com/belajarchik/TA_GTI)
 cd TA_GTI
+```
 
 ### 2. Konfigurasi dan kompilasi  proyek
+```bash
 mkdir build
 cd build
 cmake ..
 make
+```
 
 ### 3. Menjalankan (run) 
+```bash
 # MacOs
 ./Hypernova_Escape
 
 # Windows
 Hypernova_Escape.exe
+```
